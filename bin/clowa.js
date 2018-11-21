@@ -4,6 +4,7 @@ const chalk = require('chalk');
 const spawn = require('cross-spawn');
 const script = process.argv[2];
 const args = process.argv.slice(3);
+const { existsSync } = require('fs');
 
 const nodeVersion = process.versions.node;
 const versions = nodeVersion.split('.');
@@ -14,7 +15,7 @@ console.log(
   chalk.cyan(
     `Node version: ${major}.${minor} , clowa version: ${
       require('../package.json').version
-    } , shell: ${script} ${args}`
+    } , shell: ${script} ${args}`  
   )
 );
 

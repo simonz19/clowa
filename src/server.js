@@ -4,12 +4,13 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const openBrowser = require('react-dev-utils/openBrowser');
 const clearConsole = require('react-dev-utils/clearConsole');
 const chalk = require('chalk');
-const getPaths = require('./config/paths');
+const getPaths = require('./utils/getPaths');
 const cwd = process.cwd();
 
 const paths = getPaths(cwd);
 const isInteractive = process.stdout.isTTY;
-const config = require('./config/webpack.config.dev');
+const appConfig = require(paths.appConfig); // todo 这里需要判断有无文件
+const config = require('./config/webpack.config.dev')(appConfig, cwd);
 let compiler;
 
 function clearConsoleWrapped() {

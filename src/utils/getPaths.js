@@ -2,7 +2,7 @@ const { resolve } = require('path');
 const { realpathSync } = require('fs');
 
 function resolveOwn(relativePath) {
-  return resolve(__dirname, relativePath);
+  return resolve(__dirname, '..', '..', relativePath);
 }
 
 module.exports = function getPaths(cwd) {
@@ -18,9 +18,9 @@ module.exports = function getPaths(cwd) {
     appPackageJson: resolveApp('package.json'),
     appSrc: resolveApp('src'),
     appNodeModules: resolveApp('node_modules'),
-    ownNodeModules: resolveOwn('../../node_modules'),
-    // appBabelCache: resolveApp('node_modules/.cache/babel-loader'),
+    ownNodeModules: resolveOwn('node_modules'),
     resolveApp,
+    resolveOwn,
     appDirectory,
     appConfig: resolveApp('.clowarc.js'),
   };

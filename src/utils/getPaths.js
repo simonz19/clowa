@@ -6,22 +6,24 @@ function resolveOwn(relativePath) {
 }
 
 module.exports = function getPaths(cwd) {
-  const appDirectory = realpathSync(cwd);
+  const appRootPath = realpathSync(cwd);
 
   function resolveApp(relativePath) {
-    return resolve(appDirectory, relativePath);
+    return resolve(appRootPath, relativePath);
   }
 
   return {
-    appBuild: resolveApp('dist'),
-    appPublic: resolveApp('public'),
-    appPackageJson: resolveApp('package.json'),
-    appSrc: resolveApp('src'),
-    appNodeModules: resolveApp('node_modules'),
-    ownNodeModules: resolveOwn('node_modules'),
+    appBuildPath: resolveApp('dist'),
+    appPublicPath: resolveApp('public'),
+    appPackageJsonPath: resolveApp('package.json'),
+    appSrcPath: resolveApp('src'),
+    appTemplatePath: resolveApp('src/index.ejs'),
+    appEntryPath: resolveApp('src/index.js'),
+    appNodeModulesPath: resolveApp('node_modules'),
+    ownNodeModulesPath: resolveOwn('node_modules'),
     resolveApp,
     resolveOwn,
-    appDirectory,
-    appConfig: resolveApp('.clowarc.js'),
+    appRootPath,
+    appConfigPath: resolveApp('.clowarc.js')
   };
 };

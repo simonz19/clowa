@@ -4,14 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const babelOptions = require('../utils/getBabelOptions')();
 const WebpackBar = require('webpackbar');
-const autoprefixer = require('autoprefixer');
-
-const DEFAULT_BROWSERS = [
-  '>1%',
-  'last 4 versions',
-  'Firefox ESR',
-  'not ie < 9' // React doesn't support IE8 anyway
-];
+const { miniCSSLoader, styleLoader, cssLoader, postCSSLoader, lessLoader } = require('../loaders');
 
 const DEFAULT_ENTRY = './src/index.js';
 const DEFAULT_TEMPLATE = './src/index.ejs';
@@ -69,33 +62,34 @@ module.exports = cwd => {
       .options({ ...babelOptions }) // eslint-disable-line
       .end();
 
-    config.module
+    let rule = config.module
       .rule('style')
       .test(/\.(css|less)$/)
       .exclude.add(/node_modules/)
-      .end()
-      .use('mini-css')
-      .loader(MiniCssExtractPlugin.loader)
-      .options({ hmr: process.env.NODE_ENV === 'development' })
-      .end()
-      .use('css-loader')
-      .loader(require.resolve('css-loader'))
-      .options({ modules: true })
-      .end()
-      .use('postcss-loader')
-      .loader(require.resolve('postcss-loader'))
-      .options({
-        plugins: [
-          autoprefixer({
-            overrideBrowserslist: DEFAULT_BROWSERS,
-            flexbox: 'no-2009'
-          })
-        ]
-      })
-      .end()
-      .use('less-loader')
-      .loader(require.resolve('less-loader'))
       .end();
+    // if (process.env.NODE_ENV === 'development') {
+    // styleLoader(rule);
+    // } else {
+    miniCSSLoader(rule, { hmr: process.env.NODE_ENV === 'development', publicPath: '/' });
+    // }
+    cssLoader(rule, {
+      modules: {
+        mode: 'local',
+        localIdentName: '[local]__[hash:base64:5]'
+      }
+    });
+    postCSSLoader(rule);
+    lessLoader(rule);
+
+    rule = config.module
+      .rule('style_node_modules')
+      .test(/\.(css|less)$/)
+      .include.add(/node_modules/)
+      .end();
+    miniCSSLoader(rule);
+    cssLoader(rule);
+    postCSSLoader(rule);
+    lessLoader(rule);
   };
 
   const plugins = () => {

@@ -64,5 +64,5 @@ module.exports = config => {
     runDevServer(host, port, protocol);
   }
 
-  run(8000);
+  run(8001);
 };

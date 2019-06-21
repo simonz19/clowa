@@ -8,14 +8,6 @@ const DEFAULT_BROWSERS = [
   'not ie < 9' // React doesn't support IE8 anyway
 ];
 
-module.exports.cssHotLoader = (rule, options) => {
-  rule
-    .use('css-hot')
-    .loader(require.resolve('css-hot-loader'))
-    .options({ ...options })
-    .end();
-};
-
 module.exports.miniCSSLoader = (rule, options) => {
   rule
     .use('mini-css')

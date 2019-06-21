@@ -7,7 +7,6 @@ const WebpackBar = require('webpackbar');
 const {
   miniCSSLoader,
   styleLoader,
-  cssHotLoader,
   cssLoader,
   postCSSLoader,
   lessLoader
@@ -74,11 +73,6 @@ module.exports = cwd => {
       .test(/\.(css|less)$/)
       .exclude.add(/node_modules/)
       .end();
-    // if (process.env.NODE_ENV === 'development') {
-    // styleLoader(rule);
-    // } else {
-    // }
-    // cssHotLoader(rule);
     miniCSSLoader(rule, { hmr: process.env.NODE_ENV === 'development', publicPath: '/' });
     cssLoader(rule, {
       modules: {

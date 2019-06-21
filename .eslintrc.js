@@ -1,12 +1,16 @@
 module.exports = {
+  parser: 'babel-eslint',
   extends: ["airbnb-base/legacy"],
   parserOptions: {
     ecmaVersion: 2017
   },
   env: {
+    browser: true,
     node: true,
     es6: true,
-    browser: false
+    mocha: true,
+    jest: true,
+    jasmine: true,
   },
   globals: {},
   rules: {

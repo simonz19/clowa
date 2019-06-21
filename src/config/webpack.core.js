@@ -4,7 +4,14 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const babelOptions = require('../utils/getBabelOptions')();
 const WebpackBar = require('webpackbar');
-const { miniCSSLoader, styleLoader, cssLoader, postCSSLoader, lessLoader } = require('../loaders');
+const {
+  miniCSSLoader,
+  styleLoader,
+  cssHotLoader,
+  cssLoader,
+  postCSSLoader,
+  lessLoader
+} = require('../loaders');
 
 const DEFAULT_ENTRY = './src/index.js';
 const DEFAULT_TEMPLATE = './src/index.ejs';
@@ -70,8 +77,9 @@ module.exports = cwd => {
     // if (process.env.NODE_ENV === 'development') {
     // styleLoader(rule);
     // } else {
-    miniCSSLoader(rule, { hmr: process.env.NODE_ENV === 'development', publicPath: '/' });
     // }
+    // cssHotLoader(rule);
+    miniCSSLoader(rule, { hmr: process.env.NODE_ENV === 'development', publicPath: '/' });
     cssLoader(rule, {
       modules: {
         mode: 'local',

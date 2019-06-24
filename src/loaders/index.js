@@ -12,7 +12,7 @@ module.exports.miniCSSLoader = (rule, options) => {
   rule
     .use('mini-css')
     .loader(MiniCssExtractPlugin.loader)
-    .options({ hmr: false, ...options })
+    .options({ hmr: false, publicPath: '/', ...options })
     .end();
 };
 

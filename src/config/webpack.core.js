@@ -5,17 +5,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const babelOptions = require('../utils/getBabelOptions')();
 const WebpackBar = require('webpackbar');
 const {
-  miniCSSLoader,
-  styleLoader,
-  cssLoader,
-  postCSSLoader,
-  lessLoader
+  miniCSSLoader, cssLoader, postCSSLoader, lessLoader
 } = require('../loaders');
 
 const DEFAULT_ENTRY = './src/index.js';
 const DEFAULT_TEMPLATE = './src/index.ejs';
 
 module.exports = cwd => {
+  const isDev = process.env.NODE_ENV === 'development';
   const { resolveApp, appNodeModulesPath, ownNodeModulesPath } = require('../utils/getPaths')(cwd);
   const config = new Config();
 
@@ -73,7 +70,7 @@ module.exports = cwd => {
       .test(/\.(css|less)$/)
       .exclude.add(/node_modules/)
       .end();
-    miniCSSLoader(rule, { hmr: process.env.NODE_ENV === 'development', publicPath: '/' });
+    miniCSSLoader(rule, { hmr: !!isDev });
     cssLoader(rule, {
       modules: {
         mode: 'local',
@@ -95,10 +92,12 @@ module.exports = cwd => {
   };
 
   const plugins = () => {
+    // filename with hash will cause css hmr invalid
+    const hash = isDev ? '' : '.[contenthash:8]';
     config.plugin('mini-css').use(MiniCssExtractPlugin, [
       {
-        filename: '[name].[contenthash:8].css',
-        chunkFilename: '[name].[contenthash:8].chunk.css'
+        filename: `[name]${hash}.css`,
+        chunkFilename: `[name]${hash}.chunk.css`
       }
     ]);
 

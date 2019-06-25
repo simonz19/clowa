@@ -16,7 +16,7 @@ const {
 const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_DIST_DIR = 'dist';
 
-module.exports = (cwd, { env }) => {
+module.exports = (cwd, { env, analyser }) => {
   const isDev = env === 'development';
   const {
     resolveApp, appNodeModulesPath, ownNodeModulesPath, appConfigPath
@@ -134,6 +134,16 @@ module.exports = (cwd, { env }) => {
           template: resolveApp(DEFAULT_TEMPLATE)
         }
       ]);
+    }
+
+    if (analyser) {
+      config
+        .plugin('bundle-analyzer')
+        .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin, [
+          {
+            analyzerMode: 'static'
+          }
+        ]);
     }
   };
 

@@ -9,9 +9,9 @@ const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
 module.exports = config => {
   webpack(config, (err, stats) => {
-    if (stats.hasErrors()) {
+    if (stats.hasErrors() || stats.hasWarnings()) {
       printWebpackErrors(stats);
-      process.exit(1);
+      if (stats.hasErrors()) process.exit(1);
     }
 
     console.log(chalk.green('√ File sizes after gzip:\n'));

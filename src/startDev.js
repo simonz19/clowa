@@ -19,9 +19,10 @@ module.exports = config => {
     }
 
     let isFirstCompile = true;
-    compiler.plugin('done', stats => {
+    compiler.hooks.done.tap('clowa dev', stats => {
       if (stats.hasErrors() || stats.hasWarnings()) {
         printWebpackErrors(stats);
+        if (stats.hasErrors()) process.exit(1);
       } else if (isFirstCompile) {
         console.log();
         console.log('The app is running at:');

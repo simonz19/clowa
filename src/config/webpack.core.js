@@ -1,5 +1,4 @@
 const { existsSync } = require('fs');
-const chalk = require('react-dev-utils/chalk');
 const { isAbsolute } = require('path');
 const Config = require('webpack-chain');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -17,8 +16,8 @@ const {
 const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_DIST_DIR = 'dist';
 
-module.exports = cwd => {
-  const isDev = process.env.NODE_ENV === 'development';
+module.exports = (cwd, { env }) => {
+  const isDev = env === 'development';
   const {
     resolveApp, appNodeModulesPath, ownNodeModulesPath, appConfigPath
   } = require('./paths')(
@@ -54,12 +53,9 @@ module.exports = cwd => {
         .add(resolveApp(DEFAULT_ENTRY))
         .end();
     } else {
-      console.log(
-        chalk.red(
-          `no entry found, please configure in .clowarc.js or create a index.js inside your ${srcDir} folder`
-        )
+      throw new Error(
+        `no entry found, please configure in .clowarc.js or create a index.js inside your ${srcDir} folder`
       );
-      process.exit(1);
     }
   };
 

@@ -1,5 +1,5 @@
 module.exports = cwd => {
-  const config = require('./webpack.core')(cwd);
+  const config = require('./webpack.core')(cwd, { env: 'development' });
   config.mode('development');
   config.plugin('hmr').use(require('webpack/lib/HotModuleReplacementPlugin'));
   config.devtool('cheap-module-eval-source-map');

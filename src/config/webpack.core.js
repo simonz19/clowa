@@ -95,30 +95,28 @@ module.exports = cwd => {
       .end();
     babelLoader(rule, { extralBabelPlugins, extralBabelPresets });
 
-    rule = config.module
-      .rule('style')
-      .test(/\.(css|less)$/)
+    rule = config.module.rule('style').test(/\.(css|less)$/);
+    let one = rule
+      .oneOf('self')
       .exclude.add(/node_modules/)
       .end();
-    miniCSSLoader(rule, { hmr: !!isDev });
-    cssLoader(rule, {
+    miniCSSLoader(one, { hmr: !!isDev });
+    cssLoader(one, {
       modules: {
         mode: 'local',
         localIdentName: '[local]__[hash:base64:5]'
       }
     });
-    postCSSLoader(rule);
-    lessLoader(rule, { ...lessLoaderOptions });
-
-    rule = config.module
-      .rule('style_node_modules')
-      .test(/\.(css|less)$/)
+    postCSSLoader(one);
+    lessLoader(one, { ...lessLoaderOptions });
+    one = rule
+      .oneOf('node_module')
       .include.add(/node_modules/)
       .end();
-    miniCSSLoader(rule);
-    cssLoader(rule);
-    postCSSLoader(rule);
-    lessLoader(rule, { ...lessLoaderOptions });
+    miniCSSLoader(one);
+    cssLoader(one);
+    postCSSLoader(one);
+    lessLoader(one, { ...lessLoaderOptions });
   };
 
   const plugins = () => {
@@ -143,10 +141,28 @@ module.exports = cwd => {
     }
   };
 
+  const optimize = () => {
+    const commons = config.entryPoints.store.size > 1
+      ? {
+        // commons: {
+        //   name: 'commons',
+        //   chunks: 'initial',
+        //   minChunks: 2
+        // }
+      }
+      : {};
+    config.optimization.splitChunks({
+      chunks: 'all', // three valid values: all, async, initial
+      name: '_vendors', // the name of splited chunks, if matches an entry name, the entry point will be removed
+      cacheGroups: { ...commons }
+    });
+  };
+
   entry();
   output();
   resolve();
   loaders();
   plugins();
+  optimize();
   return config;
 };

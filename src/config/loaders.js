@@ -1,5 +1,6 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const autoprefixer = require('autoprefixer');
+const babelOptions = require('./babelOptions');
 
 const DEFAULT_BROWSERS = [
   '>1%',
@@ -56,5 +57,21 @@ module.exports.lessLoader = (rule, options) => {
     .use('less-loader')
     .loader(require.resolve('less-loader'))
     .options({ javascriptEnabled: true, ...options })
+    .end();
+};
+
+module.exports.fileLoader = (rule, options) => {
+  rule
+    .use('file-loader')
+    .loader(require.resolve('file-loader'))
+    .options({ name: 'static/[name].[hash:8].[ext]', ...options })
+    .end();
+};
+
+module.exports.babelLoader = (rule, options) => {
+  rule
+    .use('babel-loader')
+    .loader(require.resolve('babel-loader'))
+    .options({ ...babelOptions({ ...options }) })
     .end();
 };

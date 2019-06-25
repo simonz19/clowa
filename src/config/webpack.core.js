@@ -1,33 +1,71 @@
 const { existsSync } = require('fs');
+const chalk = require('react-dev-utils/chalk');
+const { isAbsolute } = require('path');
 const Config = require('webpack-chain');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const babelOptions = require('../utils/getBabelOptions')();
 const WebpackBar = require('webpackbar');
 const {
-  miniCSSLoader, cssLoader, postCSSLoader, lessLoader
-} = require('../loaders');
+  miniCSSLoader,
+  cssLoader,
+  postCSSLoader,
+  lessLoader,
+  fileLoader,
+  babelLoader
+} = require('./loaders');
 
-const DEFAULT_ENTRY = './src/index.js';
-const DEFAULT_TEMPLATE = './src/index.ejs';
+const DEFAULT_SRC_DIR = 'src';
+const DEFAULT_DIST_DIR = 'dist';
 
 module.exports = cwd => {
   const isDev = process.env.NODE_ENV === 'development';
-  const { resolveApp, appNodeModulesPath, ownNodeModulesPath } = require('../utils/getPaths')(cwd);
+  const {
+    resolveApp, appNodeModulesPath, ownNodeModulesPath, appConfigPath
+  } = require('./paths')(
+    cwd
+  );
+
+  const {
+    lessLoaderOptions,
+    entry: rcEntry,
+    srcDir = DEFAULT_SRC_DIR,
+    distDir = DEFAULT_DIST_DIR,
+    extralBabelPlugins,
+    extralBabelPresets
+  } = existsSync(appConfigPath) ? require(appConfigPath) : {};
+
+  const DEFAULT_ENTRY = `${srcDir}/index.js`;
+  const DEFAULT_TEMPLATE = `${srcDir}/index.ejs`;
+
   const config = new Config();
 
   const entry = () => {
-    if (existsSync(resolveApp(DEFAULT_ENTRY))) {
+    if (typeof rcEntry === 'string' || rcEntry instanceof Array) {
+      config.merge({
+        entry: { index: rcEntry }
+      });
+    } else if (rcEntry instanceof Object) {
+      config.merge({
+        entry: { ...rcEntry }
+      });
+    } else if (existsSync(resolveApp(DEFAULT_ENTRY))) {
       config
         .entry('index')
-        .add(DEFAULT_ENTRY)
+        .add(resolveApp(DEFAULT_ENTRY))
         .end();
+    } else {
+      console.log(
+        chalk.red(
+          `no entry found, please configure in .clowarc.js or create a index.js inside your ${srcDir} folder`
+        )
+      );
+      process.exit(1);
     }
   };
 
   const output = () => {
     config.output
-      .path(resolveApp('dist'))
+      .path(isAbsolute(distDir) ? distDir : resolveApp(distDir))
       .publicPath('/')
       .filename('[name].[hash:8].js')
       .chunkFilename('[name].[hash:8].chunk.js')
@@ -42,30 +80,22 @@ module.exports = cwd => {
       .modules.add(ownNodeModulesPath)
       .add(appNodeModulesPath)
       .end()
-      .alias.set('@', resolveApp('src'))
+      .alias.set('@', resolveApp(srcDir))
       .end();
   };
 
   const loaders = () => {
-    config.module
-      .rule('pic')
-      .test(/\.(png|svg|jpg|gif|jpeg)$/)
-      .use('file-loader')
-      .loader(require.resolve('file-loader'))
-      .options({ name: 'static/[name].[hash:8].[ext]' })
-      .end();
+    let rule = config.module.rule('pic').test(/\.(png|svg|jpg|gif|jpeg)$/);
+    fileLoader(rule);
 
-    config.module
+    rule = config.module
       .rule('babel')
       .test(/\.(js|jsx)$/)
       .exclude.add(/node_modules/)
-      .end()
-      .use('babel-loader')
-      .loader(require.resolve('babel-loader'))
-      .options({ ...babelOptions }) // eslint-disable-line
       .end();
+    babelLoader(rule, { extralBabelPlugins, extralBabelPresets });
 
-    let rule = config.module
+    rule = config.module
       .rule('style')
       .test(/\.(css|less)$/)
       .exclude.add(/node_modules/)
@@ -78,7 +108,7 @@ module.exports = cwd => {
       }
     });
     postCSSLoader(rule);
-    lessLoader(rule);
+    lessLoader(rule, { ...lessLoaderOptions });
 
     rule = config.module
       .rule('style_node_modules')
@@ -88,7 +118,7 @@ module.exports = cwd => {
     miniCSSLoader(rule);
     cssLoader(rule);
     postCSSLoader(rule);
-    lessLoader(rule);
+    lessLoader(rule, { ...lessLoaderOptions });
   };
 
   const plugins = () => {

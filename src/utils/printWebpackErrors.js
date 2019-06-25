@@ -1,5 +1,5 @@
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
-const chalk = require('chalk');
+const chalk = require('react-dev-utils/chalk');
 
 module.exports = stats => {
   const json = stats.toJson({}, true);

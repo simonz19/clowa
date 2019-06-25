@@ -1,12 +1,13 @@
 const { existsSync } = require('fs');
 const { resolve } = require('path');
 
-const rcname = '.clowarc.js';
-
-module.exports = (config, cwd = process.cwd()) => {
-  const rcpath = resolve(cwd, rcname);
+module.exports = config => {
+  const rcpath = resolve('../config/paths.js');
   if (existsSync(rcpath)) {
-    return require(rcpath)(config);
+    const rc = require(rcpath);
+    if (rc && rc.webpackChain && typeof rc.webpackChain === 'function') {
+      return rc.webpackChain(config);
+    }
   }
   return config;
 };

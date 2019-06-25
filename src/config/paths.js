@@ -13,12 +13,7 @@ module.exports = function getPaths(cwd) {
   }
 
   return {
-    appBuildPath: resolveApp('dist'),
-    appPublicPath: resolveApp('public'),
     appPackageJsonPath: resolveApp('package.json'),
-    appSrcPath: resolveApp('src'),
-    appTemplatePath: resolveApp('src/index.ejs'),
-    appEntryPath: resolveApp('src/index.js'),
     appNodeModulesPath: resolveApp('node_modules'),
     ownNodeModulesPath: resolveOwn('node_modules'),
     resolveApp,

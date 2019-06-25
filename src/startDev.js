@@ -1,10 +1,13 @@
 const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
 const openBrowser = require('react-dev-utils/openBrowser');
-const chalk = require('chalk');
-const cwd = process.cwd();
-const { appPublicPath } = require('./utils/getPaths')(cwd);
+const chalk = require('react-dev-utils/chalk');
 const printWebpackErrors = require('./utils/printWebpackErrors');
+const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
+const args = require('yargs-parser')(process.argv.slice(2));
+const {
+  o: openBrowserv, h: hostv = 'localhost', p: portv = 8000, P: protocolv = 'http'
+} = args;
 
 module.exports = config => {
   let compiler;
@@ -38,7 +41,7 @@ module.exports = config => {
       disableHostCheck: true,
       compress: true,
       clientLogLevel: 'none',
-      contentBase: appPublicPath,
+      contentBase: false,
       hot: true,
       publicPath: '/',
       quiet: true,
@@ -49,20 +52,25 @@ module.exports = config => {
       host
     });
 
-    devServer.listen(port, '0.0.0.0', err => {
+    devServer.listen(port, 'localhost', err => {
       if (err) {
         return;
       }
-      openBrowser(`${protocol}://${host}:${port}/`);
+      if (openBrowserv) {
+        openBrowser(`${protocol}://${host}:${port}/`);
+      }
     });
   }
 
   function run(port) {
-    const protocol = process.env.HTTPS === 'true' ? 'https' : 'http';
-    const host = process.env.HOST || 'localhost';
-    setupCompiler(host, port, protocol);
-    runDevServer(host, port, protocol);
+    setupCompiler(hostv, port, protocolv);
+    runDevServer(hostv, port, protocolv);
   }
 
-  run(8001);
+  choosePort(hostv, portv).then(port => {
+    if (port === null) {
+      return;
+    }
+    run(port);
+  });
 };

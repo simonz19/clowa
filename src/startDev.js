@@ -22,7 +22,7 @@ module.exports = config => {
     compiler.hooks.done.tap('clowa dev', stats => {
       if (stats.hasErrors() || stats.hasWarnings()) {
         printWebpackErrors(stats);
-        if (stats.hasErrors()) process.exit(1);
+        if (stats.hasErrors() && isFirstCompile) process.exit(1);
       } else if (isFirstCompile) {
         console.log();
         console.log('The app is running at:');
@@ -41,6 +41,7 @@ module.exports = config => {
     const devServer = new WebpackDevServer(compiler, {
       disableHostCheck: true,
       compress: true,
+      historyApiFallback: true,
       clientLogLevel: 'none',
       contentBase: false,
       hot: true,

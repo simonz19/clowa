@@ -30,7 +30,8 @@ module.exports = (cwd, { env, analyser }) => {
     srcDir = DEFAULT_SRC_DIR,
     distDir = DEFAULT_DIST_DIR,
     extralBabelPlugins,
-    extralBabelPresets
+    extralBabelPresets,
+    extralBabelIncludes
   } = existsSync(appConfigPath) ? require(appConfigPath) : {};
 
   const DEFAULT_ENTRY = `${srcDir}/index.js`;
@@ -73,8 +74,8 @@ module.exports = (cwd, { env, analyser }) => {
       .add('.js')
       .prepend('.json')
       .end()
-      .modules.add(ownNodeModulesPath)
-      .add(appNodeModulesPath)
+      .modules.add(appNodeModulesPath)
+      .add(ownNodeModulesPath)
       .end()
       .alias.set('@', resolveApp(srcDir))
       .end();
@@ -91,6 +92,17 @@ module.exports = (cwd, { env, analyser }) => {
       .end();
     babelLoader(rule, { extralBabelPlugins, extralBabelPresets });
 
+    if (extralBabelIncludes && extralBabelIncludes instanceof Array) {
+      extralBabelIncludes.forEach((pattern, index) => {
+        rule = config.module
+          .rule(`babel_extral_${index}`)
+          .test(/\.(js|jsx)$/)
+          .inlcude.add(pattern)
+          .end();
+        babelLoader(rule, { extralBabelPlugins, extralBabelPresets });
+      });
+    }
+
     rule = config.module.rule('style').test(/\.(css|less)$/);
     let one = rule
       .oneOf('self')
@@ -106,7 +118,7 @@ module.exports = (cwd, { env, analyser }) => {
     postCSSLoader(one);
     lessLoader(one, { ...lessLoaderOptions });
     one = rule
-      .oneOf('node_module')
+      .oneOf('node_modules')
       .include.add(/node_modules/)
       .end();
     miniCSSLoader(one);

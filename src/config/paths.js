@@ -19,6 +19,7 @@ module.exports = function getPaths(cwd) {
     resolveApp,
     resolveOwn,
     appRootPath,
-    appConfigPath: resolveApp('.clowarc.js')
+    appConfigPath: resolveApp('.clowarc.js'),
+    appClowaPath: resolveApp('.clowa')
   };
 };

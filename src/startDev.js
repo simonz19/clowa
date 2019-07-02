@@ -4,6 +4,7 @@ const openBrowser = require('react-dev-utils/openBrowser');
 const chalk = require('react-dev-utils/chalk');
 const printWebpackErrors = require('./utils/printWebpackErrors');
 const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
+const setupHooks = require('./utils/setupHooks');
 const args = require('yargs-parser')(process.argv.slice(2));
 const {
   o: openBrowserv, h: hostv = 'localhost', p: portv = 8000, P: protocolv = 'http'
@@ -35,6 +36,7 @@ module.exports = config => {
         isFirstCompile = false;
       }
     });
+    setupHooks(compiler, process.cwd());
   }
 
   function runDevServer(host, port, protocol) {
@@ -48,7 +50,7 @@ module.exports = config => {
       publicPath: '/',
       quiet: true,
       watchOptions: {
-        ignored: /node_modules/
+        ignored: ['**/node_modules', '**/.clowa']
       },
       https: protocol === 'https',
       host

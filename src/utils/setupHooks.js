@@ -1,6 +1,5 @@
 const { existsSync } = require('fs');
-const { resolve } = require('path');
-const routerGenerator = require('../utils/routerGenerator');
+const routerGenerator = require('../hooks/routerGenerator');
 
 const mergeHooks = (...hookGroups) => {
   const result = {};
@@ -23,7 +22,7 @@ module.exports = (compiler, cwd) => {
       routerConfig
         ? routerGenerator({
           config: routerConfig,
-          dist: resolve(appClowaPath, 'routers.js')
+          dist: `${appClowaPath}/routers.js`
         })
         : undefined
     ]

@@ -2,9 +2,9 @@ const WebpackDevServer = require('webpack-dev-server');
 const webpack = require('webpack');
 const openBrowser = require('react-dev-utils/openBrowser');
 const chalk = require('react-dev-utils/chalk');
+const setupHooks = require('./utils/setupHooks');
 const printWebpackErrors = require('./utils/printWebpackErrors');
 const { choosePort } = require('react-dev-utils/WebpackDevServerUtils');
-const setupHooks = require('./utils/setupHooks');
 const args = require('yargs-parser')(process.argv.slice(2));
 const {
   o: openBrowserv, h: hostv = 'localhost', p: portv = 8000, P: protocolv = 'http'

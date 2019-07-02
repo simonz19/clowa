@@ -1,5 +1,4 @@
 const { existsSync } = require('fs');
-const { isAbsolute } = require('path');
 const Config = require('webpack-chain');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -13,29 +12,27 @@ const {
   babelLoader
 } = require('./loaders');
 
-const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_DIST_DIR = 'dist';
-
 module.exports = (cwd, { env, analyser }) => {
   const isDev = env === 'development';
   const {
-    resolveApp, appNodeModulesPath, ownNodeModulesPath, appConfigPath
-  } = require('./paths')(
-    cwd
-  );
+    resolveApp,
+    appNodeModulesPath,
+    ownNodeModulesPath,
+    appConfigPath,
+    appSrcPath,
+    appDistPath
+  } = require('./paths')(cwd);
 
   const {
     lessLoaderOptions,
     entry: rcEntry,
-    srcDir = DEFAULT_SRC_DIR,
-    distDir = DEFAULT_DIST_DIR,
     extralBabelPlugins,
     extralBabelPresets,
     extralBabelIncludes
   } = existsSync(appConfigPath) ? require(appConfigPath) : {};
 
-  const DEFAULT_ENTRY = `${srcDir}/index.js`;
-  const DEFAULT_TEMPLATE = `${srcDir}/index.ejs`;
+  const DEFAULT_ENTRY = `${appSrcPath}/index.js`;
+  const DEFAULT_TEMPLATE = `${appSrcPath}/index.ejs`;
 
   const config = new Config();
 
@@ -55,14 +52,14 @@ module.exports = (cwd, { env, analyser }) => {
         .end();
     } else {
       throw new Error(
-        `no entry found, please configure in .clowarc.js or create a index.js inside your ${srcDir} folder`
+        `no entry found, please configure in .clowarc.js or create a index.js inside your ${appSrcPath} folder`
       );
     }
   };
 
   const output = () => {
     config.output
-      .path(isAbsolute(distDir) ? distDir : resolveApp(distDir))
+      .path(appDistPath)
       .publicPath('/')
       .filename('[name].[hash:8].js')
       .chunkFilename('[name].[hash:8].chunk.js')
@@ -77,7 +74,7 @@ module.exports = (cwd, { env, analyser }) => {
       .modules.add(appNodeModulesPath)
       .add(ownNodeModulesPath)
       .end()
-      .alias.set('@', resolveApp(srcDir))
+      .alias.set('@', resolveApp(appSrcPath))
       .end();
   };
 

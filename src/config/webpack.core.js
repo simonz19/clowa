@@ -19,6 +19,7 @@ module.exports = (cwd, { env, analyser }) => {
     appNodeModulesPath,
     ownNodeModulesPath,
     appConfigPath,
+    appRootPath,
     appSrcPath,
     appDistPath
   } = require('./paths')(cwd);
@@ -74,7 +75,7 @@ module.exports = (cwd, { env, analyser }) => {
       .modules.add(appNodeModulesPath)
       .add(ownNodeModulesPath)
       .end()
-      .alias.set('@', resolveApp(appSrcPath))
+      .alias.set('@', appSrcPath).set('~', appRootPath)
       .end();
   };
 

@@ -18,7 +18,7 @@ module.exports = (compiler, cwd) => {
   const { hooks = {}, routerConfig } = existsSync(appConfigPath) ? require(appConfigPath) : {};
 
   const defaultHooks = {
-    beforeRun: [
+    beforeCompile: [
       routerConfig
         ? routerGenerator({
           config: routerConfig,
